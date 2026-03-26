@@ -1,10 +1,10 @@
-import { drawRect } from "../utils.js";
+import {drawArc } from "../utils.js";
 export default class Laser {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.width = 10;
-    this.height = 10;
+    this.width = 4;
+    this.height = 4;
     this.speed = 10;
     this.markedForDeletion = false;
   }
@@ -14,6 +14,7 @@ export default class Laser {
   }
 
   draw(ctx) {
-    drawRect(ctx, this.x, this.y, this.width, this.height, "#0f0");
+    drawArc(ctx, this.x, this.y, this.width+2, "#f00");
+    drawArc(ctx, this.x, this.y, this.width, "#ff0");
   }
 }

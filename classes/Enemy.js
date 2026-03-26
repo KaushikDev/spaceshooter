@@ -6,12 +6,22 @@ export default class Enemy {
     this.y = y;
     this.width = 30;
     this.height = 30;
-    this.speed = 7;
+    this.speed = 4;
+    this.vx = 0;
+    this.vy = 0;
     this.markedForDeletion = false;
   }
 
-  update() {
-    this.x -= this.speed;
+  update(player) {
+    let distX = player.x - this.x;
+    let distY = player.y - this.y;
+
+    let angleTrajectory = Math.atan2(distY, distX);
+    this.vx = this.speed * Math.cos(angleTrajectory);
+    this.vy = this.speed * Math.sin(angleTrajectory);
+
+    this.x += this.vx;
+    this.y += this.vy;
   }
 
   draw(ctx) {

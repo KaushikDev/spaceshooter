@@ -142,7 +142,7 @@ function init() {
         );
       }
       enemies.forEach((enemy) => {
-        enemy.update();
+        enemy.update(player);
       });
 
       //collisions
@@ -152,7 +152,7 @@ function init() {
             enemy.markedForDeletion = true;
             laser.markedForDeletion = true;
             score.score++;
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 100; i++) {
               particles.push(
                 new Particle(
                   enemy.x + enemy.width / 2,
@@ -163,8 +163,19 @@ function init() {
           }
         });
         if (collisionDetection(enemy, player)) {
-          health.health -= 25;
+          health.health -= 20;
           enemy.markedForDeletion = true;
+          for (let i = 0; i < 500; i++) {
+            particles.push(
+              new Particle(
+                player.x + player.width / 2,
+                player.y + player.height / 2,
+              ),
+            );
+          }
+          player.x = 50;
+          player.y = canvas.height / 2 - player.size / 2;
+
           if (health.health <= 0) {
             gameState = "OVER";
             startButton.style.display = "none";

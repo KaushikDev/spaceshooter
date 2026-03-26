@@ -3,6 +3,14 @@ export function drawRect(ctx, x, y, width, height, color = "#fff") {
   ctx.fillRect(x, y, width, height);
 }
 
+export function drawArc(ctx, x, y, radius, color = "#fff") {
+  ctx.beginPath();
+  ctx.fillStyle = color;
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.closePath();
+}
+
 export function drawText(
   ctx,
   text,
