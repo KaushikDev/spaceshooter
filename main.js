@@ -17,7 +17,6 @@ const keys = {
 
 function handleKeyDown(e) {
   keys[e.code] = true;
-  console.log(e.code);
 }
 
 function handleKeyUp(e) {
@@ -28,6 +27,7 @@ function init() {
   let lasers = [];
   let enemies = [];
   let stars = [];
+  let particles = [];
   let frames = 0;
   let gameState = "START";
   let highScore = localStorage.getItem("spaceShooterHighScore") || 0;
@@ -113,6 +113,12 @@ function init() {
         star.y = Math.random() * canvas.height;
       }
     });
+
+    particles.forEach((particle) => {
+      particle.update();
+      particle.draw(ctx);
+    });
+    particles = particles.filter((particle) => particle.alpha > 0);
     if (gameState === "PLAYING") {
       //updates:
 
@@ -136,6 +142,14 @@ function init() {
             enemy.markedForDeletion = true;
             laser.markedForDeletion = true;
             score.score++;
+            for (let i = 0; i < 15; i++) {
+              particles.push(
+                new Particle(
+                  enemy.x + enemy.width / 2,
+                  enemy.y + enemy.height / 2,
+                ),
+              );
+            }
           }
         });
         if (collisionDetection(enemy, player)) {
@@ -243,7 +257,7 @@ class Player {
       this.y = this.y + this.speed;
     }
     if (keys.ArrowLeft || keys.KeyA) {
-      this.x = this.x - this.speed;
+      this.x = this.x - this.speed * 2;
     }
     if (keys.ArrowRight || keys.KeyD) {
       this.x = this.x + this.speed;
@@ -310,7 +324,7 @@ class Enemy {
     this.y = y;
     this.width = 30;
     this.height = 30;
-    this.speed = 5;
+    this.speed = 7;
     this.markedForDeletion = false;
   }
 
@@ -377,6 +391,35 @@ class Star {
 
   draw(ctx) {
     drawRect(ctx, this.x, this.y, this.size, this.size);
+  }
+}
+
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.velocity = {
+      x: (Math.random() - 0.5) * 6,
+      y: (Math.random() - 0.5) * 6,
+    };
+    this.size = Math.random() * 10 + 1;
+    this.alpha = 1;
+    const colors = ["#ff0000", "#ff7700", "#ffff00"];
+    // Pick a random color from the array every time a particle is created
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  update() {
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
+    this.alpha -= 0.02;
+  }
+
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    drawRect(ctx, this.x, this.y, this.size, this.size, this.color);
+    ctx.restore();
   }
 }
 
