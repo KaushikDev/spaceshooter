@@ -1,3 +1,13 @@
+import Star from "./classes/Star.js";
+import Particle from "./classes/Particle.js";
+import Life from "./classes/Life.js";
+import Score from "./classes/Score.js";
+import Enemy from "./classes/Enemy.js";
+import Player from "./classes/Player.js";
+import { drawRect } from "./utils.js";
+import { drawText } from "./utils.js";
+import { collisionDetection } from "./utils.js";
+
 let animationId;
 let resizeObserver;
 
@@ -122,7 +132,7 @@ function init() {
     if (gameState === "PLAYING") {
       //updates:
 
-      player.update(lasers);
+      player.update(keys, lasers);
       lasers.forEach((laser) => {
         laser.update();
       });
@@ -232,197 +242,6 @@ function init() {
   });
 }
 
-class Player {
-  constructor(cWidth, cHeight) {
-    this.cWidth = cWidth;
-    this.cHeight = cHeight;
-    this.size = 40;
-    this.speed = 5;
-    this.gunWidth = 20;
-    this.gunHeight = 10;
-    this.width = this.size + this.gunWidth;
-    this.height = this.size;
-
-    this.x = 50;
-    this.y = this.cHeight / 2 - this.size / 2;
-
-    this.cooldown = 0;
-  }
-
-  update(lasers) {
-    if (keys.ArrowUp || keys.KeyW) {
-      this.y = this.y - this.speed;
-    }
-    if (keys.ArrowDown || keys.KeyS) {
-      this.y = this.y + this.speed;
-    }
-    if (keys.ArrowLeft || keys.KeyA) {
-      this.x = this.x - this.speed * 2;
-    }
-    if (keys.ArrowRight || keys.KeyD) {
-      this.x = this.x + this.speed;
-    }
-    if (this.x < 0) {
-      this.x = 0;
-    }
-    if (this.y < 0) {
-      this.y = 0;
-    }
-    if (this.x > this.cWidth - this.size - this.gunWidth) {
-      this.x = this.cWidth - this.size - this.gunWidth;
-    }
-    if (this.y > this.cHeight - this.size) {
-      this.y = this.cHeight - this.size;
-    }
-
-    if (this.cooldown > 0) {
-      this.cooldown--;
-    }
-
-    if ((keys.Space || keys.KeyX || keys.KeyO) && this.cooldown === 0) {
-      let gunTipX = this.x + this.size + this.gunWidth;
-      let gunTipY = this.y + this.size / 2 - 5;
-      lasers.push(new Laser(gunTipX, gunTipY));
-      this.cooldown = 10;
-    }
-  }
-
-  draw(ctx) {
-    drawRect(ctx, this.x, this.y, this.size, this.size, "#00f");
-    drawRect(
-      ctx,
-      this.x + this.size,
-      this.y + this.size / 2 - this.gunHeight / 2,
-      this.gunWidth,
-      this.gunHeight,
-    );
-  }
-}
-
-class Laser {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.width = 10;
-    this.height = 10;
-    this.speed = 10;
-    this.markedForDeletion = false;
-  }
-
-  update() {
-    this.x += this.speed;
-  }
-
-  draw(ctx) {
-    drawRect(ctx, this.x, this.y, this.width, this.height, "#0f0");
-  }
-}
-
-class Enemy {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.width = 30;
-    this.height = 30;
-    this.speed = 7;
-    this.markedForDeletion = false;
-  }
-
-  update() {
-    this.x -= this.speed;
-  }
-
-  draw(ctx) {
-    drawRect(ctx, this.x, this.y, this.width, this.height, "#f00");
-  }
-}
-
-class Score {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.score = 0;
-  }
-
-  draw(ctx) {
-    drawText(
-      ctx,
-      `SCORE : ${this.score}`,
-      this.x,
-      this.y,
-      "16px",
-      "#fff",
-      "left",
-    );
-  }
-}
-
-class Life {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.lives = 3;
-  }
-
-  draw(ctx) {
-    drawText(
-      ctx,
-      `LIVES : ${this.lives}`,
-      this.x,
-      this.y,
-      "16px",
-      "#fff",
-      "left",
-    );
-  }
-}
-
-class Star {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.size = Math.round(Math.random() * 2 + 1);
-    this.speed = Math.round(Math.random() * 5 + 1);
-  }
-
-  update() {
-    this.x -= this.speed;
-  }
-
-  draw(ctx) {
-    drawRect(ctx, this.x, this.y, this.size, this.size);
-  }
-}
-
-class Particle {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.velocity = {
-      x: (Math.random() - 0.5) * 6,
-      y: (Math.random() - 0.5) * 6,
-    };
-    this.size = Math.random() * 10 + 1;
-    this.alpha = 1;
-    const colors = ["#ff0000", "#ff7700", "#ffff00"];
-    // Pick a random color from the array every time a particle is created
-    this.color = colors[Math.floor(Math.random() * colors.length)];
-  }
-
-  update() {
-    this.x += this.velocity.x;
-    this.y += this.velocity.y;
-    this.alpha -= 0.02;
-  }
-
-  draw(ctx) {
-    ctx.save();
-    ctx.globalAlpha = this.alpha;
-    drawRect(ctx, this.x, this.y, this.size, this.size, this.color);
-    ctx.restore();
-  }
-}
-
 function removeCanvasIP() {
   if (animationId) {
     cancelAnimationFrame(animationId);
@@ -431,36 +250,6 @@ function removeCanvasIP() {
   document.removeEventListener("keyup", handleKeyUp);
 
   resizeObserver?.disconnect();
-}
-
-function drawRect(ctx, x, y, width, height, color = "#fff") {
-  ctx.fillStyle = color;
-  ctx.fillRect(x, y, width, height);
-}
-
-function drawText(
-  ctx,
-  text,
-  x,
-  y,
-  size = "16px",
-  color = "#fff",
-  align = "center",
-) {
-  ctx.fillStyle = color;
-  ctx.font = `${size} Arial`;
-  ctx.textAlign = align;
-  ctx.textBaseline = "middle";
-  ctx.fillText(text, x, y);
-}
-
-function collisionDetection(rect1, rect2) {
-  return (
-    rect1.x < rect2.x + rect2.width &&
-    rect1.x + rect1.width > rect2.x &&
-    rect1.y < rect2.y + rect2.height &&
-    rect1.y + rect1.height > rect2.y
-  );
 }
 
 init();
