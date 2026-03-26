@@ -1,6 +1,6 @@
 import Star from "./classes/Star.js";
 import Particle from "./classes/Particle.js";
-import Life from "./classes/Life.js";
+import Health from "./classes/Health.js";
 import Score from "./classes/Score.js";
 import Enemy from "./classes/Enemy.js";
 import Player from "./classes/Player.js";
@@ -87,7 +87,7 @@ function init() {
   }
   let player = new Player(100, 100);
   let score = new Score(200, 100);
-  let life = new Life(300, 100);
+  let health = new Health(300, 100);
 
   resizeObserver = new ResizeObserver((entries) => {
     for (let entry of entries) {
@@ -103,8 +103,8 @@ function init() {
       score.x = canvas.width - 150;
       score.y = 30;
 
-      life.x = canvas.width - 250;
-      life.y = 30;
+      health.x = canvas.width / 2 - 75;
+      health.y = 21;
     }
   });
   resizeObserver.observe(parentDiv);
@@ -163,9 +163,9 @@ function init() {
           }
         });
         if (collisionDetection(enemy, player)) {
-          life.lives--;
+          health.health -= 25;
           enemy.markedForDeletion = true;
-          if (life.lives <= 0) {
+          if (health.health <= 0) {
             gameState = "OVER";
             startButton.style.display = "none";
             restartButton.style.display = "block";
@@ -195,7 +195,7 @@ function init() {
         enemy.draw(ctx);
       });
       score.draw(ctx);
-      life.draw(ctx);
+      health.draw(ctx);
     } else if (gameState === "START") {
       drawText(
         ctx,
@@ -236,7 +236,7 @@ function init() {
     enemies = [];
     frames = 0;
     score.score = 0;
-    life.lives = 3;
+    health.health = health.maxHealth;
     player.x = 50;
     player.y = canvas.height / 2 - player.size / 2;
   });
