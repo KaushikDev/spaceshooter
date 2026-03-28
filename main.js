@@ -35,6 +35,31 @@ function handleKeyUp(e) {
 }
 
 function init() {
+  const minWidth = 1024;
+  const isTouchDevice =
+    "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const isSmallScreen = window.innerWidth < minWidth;
+
+  if (isTouchDevice || isSmallScreen) {
+    document.body.style.backgroundColor = "#101040";
+    document.body.style.margin = "0";
+    document.body.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; padding: 20px; font-family: 'Courier New', Courier, monospace;">
+        <h1 style="color: red; font-size: 45px; margin-bottom: 10px; text-shadow: 2px 2px 0px yellow, -2px -2px 0px yellow, 2px -2px 0px yellow, -2px 2px 0px yellow;">SPACE SHOOTER</h1>
+        <p style="color: white; font-size: 18px; line-height: 1.6; max-width: 450px;">
+          This game is played best on large screens and requires a physical keyboard to pilot your ship.
+          <br><br>
+          <span style="color: #00ffff; font-weight: bold; background: rgba(0, 255, 255, 0.1); padding: 5px 10px; border-radius: 5px;">
+            Minimum Resolution: ${minWidth}px width
+          </span>
+          <br><br> 
+          Please switch to a desktop or laptop computer to play!
+        </p>
+      </div>
+    `;
+    return;
+  }
+
   let lasers = [];
   let enemies = [];
   let stars = [];
@@ -43,7 +68,6 @@ function init() {
   let frames = 0;
   let gameState = "START";
   let highScore = localStorage.getItem("spaceShooterHighScore") || 0;
-  let touchContainer;
 
   const parentDiv = document.createElement("div");
   parentDiv.classList.add("canvas-container");
@@ -66,69 +90,6 @@ function init() {
   const startButton = document.createElement("button");
   const restartButton = document.createElement("button");
 
-  const isTouchDevice =
-    "ontouchstart" in window || navigator.maxTouchPoints > 0;
-
-  if (isTouchDevice) {
-    touchContainer = document.createElement("div");
-    touchContainer.style.position = "absolute";
-    touchContainer.style.inset = "0";
-    touchContainer.style.display = "none";
-    touchContainer.style.zIndex = "10";
-    parentDiv.appendChild(touchContainer);
-
-    function createTouchBtn(text, style, keyName) {
-      const btn = document.createElement("button");
-      btn.innerText = text;
-      Object.assign(btn.style, {
-        position: "absolute",
-        background: "rgba(255, 255, 255, 0.1)",
-        border: "2px solid rgba(255, 255, 255, 0.3)",
-        color: "rgba(255, 255, 255, 0.5)",
-        borderRadius: "50%",
-        width: "60px",
-        height: "60px",
-        fontSize: "24px",
-        userSelect: "none",
-        ...style,
-      });
-
-      btn.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        keys[keyName] = true;
-      });
-      btn.addEventListener("touchend", (e) => {
-        e.preventDefault();
-        keys[keyName] = false;
-      });
-      touchContainer.appendChild(btn);
-    }
-
-    createTouchBtn("W", { bottom: "100px", left: "80px" }, "KeyW");
-    createTouchBtn("S", { bottom: "30px", left: "80px" }, "KeyS");
-    createTouchBtn("A", { bottom: "65px", left: "10px" }, "KeyA");
-    createTouchBtn("D", { bottom: "65px", left: "150px" }, "KeyD");
-
-    createTouchBtn(
-      "FIRE",
-      {
-        bottom: "50px",
-        right: "30px",
-        width: "80px",
-        height: "80px",
-        background: "rgba(255, 0, 0, 0.2)",
-      },
-      "Space",
-    );
-    startButton.addEventListener(
-      "click",
-      () => (touchContainer.style.display = "block"),
-    );
-    restartButton.addEventListener(
-      "click",
-      () => (touchContainer.style.display = "block"),
-    );
-  }
   startButton.classList.add("ui__start");
   restartButton.classList.add("ui__restart");
   startButton.innerText = "START";
@@ -144,6 +105,7 @@ function init() {
 
   document.addEventListener("keydown", handleKeyDown);
   document.addEventListener("keyup", handleKeyUp);
+
   for (let i = 0; i < 50; i++) {
     stars.push(
       new Star(
@@ -152,6 +114,7 @@ function init() {
       ),
     );
   }
+
   let player = new Player(100, 100);
   let score = new Score(200, 100);
   let health = new Health(300, 100);
@@ -181,6 +144,7 @@ function init() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawRect(ctx, 0, 0, canvas.width, canvas.height, "#101040");
+
     stars.forEach((star) => {
       star.update();
       star.draw(ctx);
@@ -196,11 +160,13 @@ function init() {
       particle.draw(ctx);
     });
     particles = particles.filter((particle) => particle.alpha > 0);
+
     if (gameState === "PLAYING") {
       player.update(keys, lasers);
       lasers.forEach((laser) => {
         laser.update();
       });
+
       if (frames % 60 === 0) {
         enemies.push(
           new Enemy(canvas.width - 30, Math.random() * (canvas.height - 30)),
@@ -343,9 +309,6 @@ function init() {
         canvas.height / 1.45,
       );
     } else if (gameState === "OVER") {
-      if (isTouchDevice && touchContainer) {
-        touchContainer.style.display = "none";
-      }
       drawText(
         ctx,
         "SPACE SHOOTER",
