@@ -56,13 +56,37 @@ export default class Player {
   }
 
   draw(ctx) {
-    drawRect(ctx, this.x, this.y, this.size, this.size, "#00f");
-    drawRect(
-      ctx,
-      this.x + this.size,
-      this.y + this.size / 2 - this.gunHeight / 2,
-      this.gunWidth,
-      this.gunHeight,
-    );
+    ctx.save();
+    // Move to center of ship
+    ctx.translate(this.x + this.size / 2, this.y + this.size / 2);
+
+    // Turn on the Neon Pink glow
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = "#ff00ff";
+
+    ctx.fillStyle = "#111";
+    ctx.strokeStyle = "#00ffff";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.moveTo(25, 0);
+    ctx.lineTo(-15, -18);
+    ctx.lineTo(-5, -6);
+    ctx.lineTo(-15, 0);
+    ctx.lineTo(-5, 6);
+    ctx.lineTo(-15, 18);
+    ctx.closePath();
+
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.shadowColor = "#00ffff";
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+
+    ctx.ellipse(-10, 0, 4, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
   }
 }

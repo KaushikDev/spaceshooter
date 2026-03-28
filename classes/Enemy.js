@@ -25,6 +25,38 @@ export default class Enemy {
   }
 
   draw(ctx) {
-    drawRect(ctx, this.x, this.y, this.width, this.height, "#f00");
+    ctx.save();
+    ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "#ff0033";
+
+    ctx.fillStyle = "#0a0000";
+    ctx.strokeStyle = "#ff0033";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.moveTo(-20, 0);
+    ctx.lineTo(0, -6);
+    ctx.lineTo(-12, -18);
+    ctx.lineTo(15, -12);
+    ctx.lineTo(10, 0);
+    ctx.lineTo(15, 12);
+    ctx.lineTo(-12, 18);
+    ctx.lineTo(0, 6);
+    ctx.closePath();
+
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.shadowColor = "#ffaa00";
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+
+    let coreSize = 3 + Math.random() * 2;
+    ctx.arc(2, 0, coreSize, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
   }
 }
