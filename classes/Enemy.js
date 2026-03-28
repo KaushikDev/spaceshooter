@@ -10,15 +10,16 @@ export default class Enemy {
     this.vx = 0;
     this.vy = 0;
     this.markedForDeletion = false;
+    this.angleTrajectory = 0;
   }
 
   update(player) {
     let distX = player.x - this.x;
     let distY = player.y - this.y;
 
-    let angleTrajectory = Math.atan2(distY, distX);
-    this.vx = this.speed * Math.cos(angleTrajectory);
-    this.vy = this.speed * Math.sin(angleTrajectory);
+    this.angleTrajectory = Math.atan2(distY, distX);
+    this.vx = this.speed * Math.cos(this.angleTrajectory);
+    this.vy = this.speed * Math.sin(this.angleTrajectory);
 
     this.x += this.vx;
     this.y += this.vy;
@@ -27,6 +28,7 @@ export default class Enemy {
   draw(ctx) {
     ctx.save();
     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+    ctx.rotate(this.angleTrajectory + Math.PI);
 
     ctx.shadowBlur = 15;
     ctx.shadowColor = "#ff0033";

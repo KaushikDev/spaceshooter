@@ -4,6 +4,7 @@ import Health from "./classes/Health.js";
 import Score from "./classes/Score.js";
 import Enemy from "./classes/Enemy.js";
 import Player from "./classes/Player.js";
+import Power from "./classes/Power.js"; 
 import { drawRect } from "./utils.js";
 import { drawText } from "./utils.js";
 import { collisionDetection } from "./utils.js";
@@ -38,6 +39,7 @@ function init() {
   let enemies = [];
   let stars = [];
   let particles = [];
+  let powerUps = [];
   let frames = 0;
   let gameState = "START";
   let highScore = localStorage.getItem("spaceShooterHighScore") || 0;
@@ -130,7 +132,6 @@ function init() {
     });
     particles = particles.filter((particle) => particle.alpha > 0);
     if (gameState === "PLAYING") {
-      //updates:
 
       player.update(keys, lasers);
       lasers.forEach((laser) => {
@@ -145,7 +146,21 @@ function init() {
         enemy.update(player);
       });
 
-      //collisions
+      if (health.health < health.maxHealth && health.health > 0) {
+        if (frames % 600 === 0) {
+          powerUps.push(
+            new Power(
+              canvas.width,
+              Math.random() * (canvas.height - 40),
+            ),
+          );
+        }
+      }
+
+      powerUps.forEach((powerUp) => {
+        powerUp.update();
+      });
+
       enemies.forEach((enemy) => {
         lasers.forEach((laser) => {
           if (collisionDetection(enemy, laser)) {
@@ -162,9 +177,12 @@ function init() {
             }
           }
         });
+
+        // Player vs Enemy
         if (collisionDetection(enemy, player)) {
           health.health -= 20;
           enemy.markedForDeletion = true;
+
           for (let i = 0; i < 500; i++) {
             particles.push(
               new Particle(
@@ -188,23 +206,38 @@ function init() {
         }
       });
 
-      //filtering only onscreen objects
+      powerUps.forEach((powerUp) => {
+        if (collisionDetection(powerUp, player)) {
+          powerUp.markedForDeletion = true;
+
+          health.health = Math.min(health.maxHealth, health.health + 25);
+
+          for (let i = 0; i < 20; i++) {
+            let p = new Particle(
+              powerUp.x + powerUp.width / 2,
+              powerUp.y + powerUp.height / 2,
+            );
+            p.color = "#00ff00";
+            particles.push(p);
+          }
+        }
+      });
+
       lasers = lasers.filter(
         (laser) => laser.x < canvas.width && !laser.markedForDeletion,
       );
       enemies = enemies.filter(
         (enemy) => enemy.x + enemy.width > 0 && !enemy.markedForDeletion,
       );
+      powerUps = powerUps.filter(
+        (powerUp) =>
+          powerUp.x + powerUp.width > 0 && !powerUp.markedForDeletion,
+      );
 
-      //drawing
-
+      powerUps.forEach((powerUp) => powerUp.draw(ctx));
       player.draw(ctx);
-      lasers.forEach((laser) => {
-        laser.draw(ctx);
-      });
-      enemies.forEach((enemy) => {
-        enemy.draw(ctx);
-      });
+      lasers.forEach((laser) => laser.draw(ctx));
+      enemies.forEach((enemy) => enemy.draw(ctx));
       score.draw(ctx);
       health.draw(ctx);
     } else if (gameState === "START") {
@@ -249,8 +282,22 @@ function init() {
         canvas.height / 1.45,
       );
     } else if (gameState === "OVER") {
-      drawText(ctx, "SPACE SHOOTER", canvas.width / 2 + 4, canvas.height / 4 + 4, "50px", "red");
-      drawText(ctx, "SPACE SHOOTER", canvas.width / 2, canvas.height / 4, "50px", "yellow");
+      drawText(
+        ctx,
+        "SPACE SHOOTER",
+        canvas.width / 2 + 4,
+        canvas.height / 4 + 4,
+        "50px",
+        "red",
+      );
+      drawText(
+        ctx,
+        "SPACE SHOOTER",
+        canvas.width / 2,
+        canvas.height / 4,
+        "50px",
+        "yellow",
+      );
       drawText(ctx, "GAME OVER", canvas.width / 2, canvas.height / 3);
       drawText(
         ctx,
@@ -287,6 +334,7 @@ function init() {
     gameState = "PLAYING";
     lasers = [];
     enemies = [];
+    powerUps = [];
     frames = 0;
     score.score = 0;
     health.health = health.maxHealth;
@@ -297,9 +345,9 @@ function init() {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       if (gameState === "START") {
-        startButton.click(); // Triggers the start logic above
+        startButton.click();
       } else if (gameState === "OVER") {
-        restartButton.click(); // Triggers the restart logic above
+        restartButton.click();
       }
     }
   });
