@@ -210,47 +210,65 @@ function init() {
     } else if (gameState === "START") {
       drawText(
         ctx,
-        `HighScore : ${highScore}`,
+        "SPACE SHOOTER",
+        canvas.width / 2 + 4,
+        canvas.height / 4 + 4,
+        "50px",
+        "red",
+      );
+      drawText(
+        ctx,
+        "SPACE SHOOTER",
+        canvas.width / 2,
+        canvas.height / 4,
+        "50px",
+        "yellow",
+      );
+      drawText(
+        ctx,
+        `HighScore ${highScore}`,
+        canvas.width / 2,
+        canvas.height / 3,
+      );
+      drawText(
+        ctx,
+        "Press ENTER to play",
         canvas.width / 2,
         canvas.height / 2.5,
       );
       drawText(
         ctx,
-        "Press ENTER to Start",
+        "Move player with W S A D or Arrow keys",
         canvas.width / 2,
-        canvas.height / 2.25,
+        canvas.height / 1.65,
       );
       drawText(
         ctx,
-        "Move using :  W, S, A, D, or Arrow keys. ",
+        " Shoot with SPACE or O or X key",
         canvas.width / 2,
-        canvas.height / 1.75,
-      );
-      drawText(
-        ctx,
-        " Shoot using : Space or O or X ",
-        canvas.width / 2,
-        canvas.height / 1.6,
+        canvas.height / 1.45,
       );
     } else if (gameState === "OVER") {
+      drawText(ctx, "SPACE SHOOTER", canvas.width / 2 + 4, canvas.height / 4 + 4, "50px", "red");
+      drawText(ctx, "SPACE SHOOTER", canvas.width / 2, canvas.height / 4, "50px", "yellow");
       drawText(ctx, "GAME OVER", canvas.width / 2, canvas.height / 3);
       drawText(
         ctx,
-        `Score : ${score.score}`,
-        canvas.width / 2,
-        canvas.height / 2.75,
-      );
-      drawText(
-        ctx,
-        `HighScore : ${highScore}`,
+        " Press ENTER to play again",
         canvas.width / 2,
         canvas.height / 2.5,
       );
       drawText(
         ctx,
-        " Press ENTER to Restart",
+        `Score ${score.score}`,
         canvas.width / 2,
-        canvas.height / 2.25,
+        canvas.height / 1.65,
+      );
+      drawText(
+        ctx,
+        `HighScore ${highScore}`,
+        canvas.width / 2,
+        canvas.height / 1.45,
       );
     }
 
