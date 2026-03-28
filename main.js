@@ -210,24 +210,48 @@ function init() {
     } else if (gameState === "START") {
       drawText(
         ctx,
+        `HighScore : ${highScore}`,
+        canvas.width / 2,
+        canvas.height / 2.5,
+      );
+      drawText(
+        ctx,
+        "Press ENTER to Start",
+        canvas.width / 2,
+        canvas.height / 2.25,
+      );
+      drawText(
+        ctx,
         "Move using :  W, S, A, D, or Arrow keys. ",
         canvas.width / 2,
-        canvas.height / 2,
+        canvas.height / 1.75,
       );
       drawText(
         ctx,
         " Shoot using : Space or O or X ",
         canvas.width / 2,
-        canvas.height / 3,
+        canvas.height / 1.6,
+      );
+    } else if (gameState === "OVER") {
+      drawText(ctx, "GAME OVER", canvas.width / 2, canvas.height / 3);
+      drawText(
+        ctx,
+        `Score : ${score.score}`,
+        canvas.width / 2,
+        canvas.height / 2.75,
       );
       drawText(
         ctx,
         `HighScore : ${highScore}`,
         canvas.width / 2,
-        canvas.height / 4,
+        canvas.height / 2.5,
       );
-    } else if (gameState === "OVER") {
-      drawText(ctx, "GAME OVER", canvas.width / 2, canvas.height / 2);
+      drawText(
+        ctx,
+        " Press ENTER to Restart",
+        canvas.width / 2,
+        canvas.height / 2.25,
+      );
     }
 
     animationId = requestAnimationFrame(gameLoop);
@@ -250,6 +274,16 @@ function init() {
     health.health = health.maxHealth;
     player.x = 50;
     player.y = canvas.height / 2 - player.size / 2;
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      if (gameState === "START") {
+        startButton.click(); // Triggers the start logic above
+      } else if (gameState === "OVER") {
+        restartButton.click(); // Triggers the restart logic above
+      }
+    }
   });
 }
 

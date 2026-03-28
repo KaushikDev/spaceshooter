@@ -6,7 +6,7 @@ export default class Enemy {
     this.y = y;
     this.width = 30;
     this.height = 30;
-    this.speed = 4;
+    this.speed = 3 + Math.random() * 2;
     this.vx = 0;
     this.vy = 0;
     this.markedForDeletion = false;
